@@ -2,13 +2,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Read {
 	public static void main(String[] args){
 		HashMap<String,String> map = new HashMap<String,String>();
 		HashMap<String,String> maps = new HashMap<String,String>();
-		HashMap<String,String> list = new HashMap<String,String>();
 		HashMap<String,String> lists = new HashMap<String,String>();
 
 
@@ -24,13 +24,13 @@ public class Read {
 
 			while((s = br.readLine()) != null){
 				String array[] = s.split(",");
-				//System.out.println(array[0]);
 				if(array.length != 2) throw new NumberFormatException();
 				String cd   = (array[0]);
 				String name = (array[1]);
 				map.put(cd, name);
-				//System.out.println(map.get("001"));
+
 			}
+
 			br.close();
 
 		}catch(IOException e){
@@ -69,23 +69,38 @@ public class Read {
 			File dir = new File(args[0]);
 			File[] f1 = dir.listFiles();
 			for(int i = 0; i < f1.length; i++){
+				//箱の初期化の宣言
+				ArrayList<String> list = new ArrayList<String>();
 				if(f1[i].getName().endsWith(".rcd")){
 					File f2 = f1[i];
+					BufferedReader  bb = new BufferedReader(new FileReader(f2));
+					String b;
+					while((b = bb.readLine()) != null){
+						list.add(b);
 
-			BufferedReader  bb = new BufferedReader(new FileReader(f2));
-			String b;
-			while((b = bb.readLine())!= null){
-				String array[] = b.split(",");
-				if(array.length != 3) throw new NumberFormatException();
-				String cd = array[0];
-				String shcord = array[1];
-				String sell = array[2];
-				list.put(cd, sell);
-				lists.put(shcord, sell);
-				System.out.println("001");
-			}
-			bb.close();
+					}
+
+					// 加算処理をする
+					String cord = list.get(0);
+					String shcord = list.get(1);
+					String sell = list.get(2);
+					lists.put(cord, sell);
+					lists.put(shcord,sell);
+
+					System.out.println(lists.get("001"));
+
+//					int sum = 0;
+//					sum += Integer.parseInt(list.get(2));
+//					System.out.println(sum);
+
+//					String sums = list.get(1);
+//					sums += Integer.parseInt(list.get(2));
+//					System.out.println(sums);
+
+					bb.close();
+
 				}
+
 			}
 		}catch(IOException x){
 			System.out.println(x);
