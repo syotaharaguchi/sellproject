@@ -91,7 +91,7 @@ public class Read {
 					//cordとcdのコードを比較、同じならば売上を加算
 					if(map.containsKey(cord) ){
 						tmp = lists.get(cord);
-						if(tmp.equals(cord) ) {
+						if(tmp ==   ){
 							//System.out.println(tmp);
 							sums += Integer.parseInt(tmp);
 						}
