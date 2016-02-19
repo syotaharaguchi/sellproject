@@ -13,7 +13,6 @@ public class Read {
 		HashMap<String,String> shlist = new HashMap<String,String>();
 		HashMap<String,String> sum = new HashMap<String,String>();
 
-
 		try{
 			File file = new File(args[0],"branch.lst");
 			if(!file.exists()){
@@ -32,7 +31,6 @@ public class Read {
 				map.put(cd, name);
 
 			}
-
 			br.close();
 
 		}catch(IOException e){
@@ -70,7 +68,8 @@ public class Read {
 		try{
 			File dir = new File(args[0]);
 			File[] f1 = dir.listFiles();
-			int tmp = 0;
+			int sums = 0;
+			String tmp = null;
 			for(int i = 0; i < f1.length; i++){
 				//箱の初期化の宣言
 				ArrayList<String> list = new ArrayList<String>();
@@ -81,27 +80,32 @@ public class Read {
 					String b;
 					while((b = bb.readLine()) != null){
 						list.add(b);
-					}
 
+					}
 					// 加算処理をする
 					String cord = list.get(0);
 					String shcord = list.get(1);
 					String sell = list.get(2);
 					lists.put(cord, sell);
 					shlist.put(shcord,sell);
-					//cordとcdの値を比較、同じならば売上を加算
-
-					tmp += Integer.parseInt(list.get(2));
-					System.out.println(tmp);
-
-
+					//cordとcdのコードを比較、同じならば売上を加算
+					if(map.containsKey(cord) ){
+						tmp = lists.get(cord);
+						if(tmp.equals(cord) ) {
+							//System.out.println(tmp);
+							sums += Integer.parseInt(tmp);
+						}
+					}else{
+						System.out.println("test");
+					}
 				bb.close();
 				}
 
 				}
 
-			System.out.println(lists.entrySet());
-//			System.out.println(shlist.entrySet());
+						System.out.println(sums);
+			//			System.out.println(lists.entrySet());
+			//			System.out.println(shlist.entrySet());
 
 		}catch(IOException x){
 			System.out.println(x);
