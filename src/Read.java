@@ -1,17 +1,20 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Read {
 	public static void main(String[] args){
-		HashMap<String,String> map = new HashMap<String,String>();
-		HashMap<String,String> maps = new HashMap<String,String>();
-		HashMap<String,String> lists = new HashMap<String,String>();
-		HashMap<String,String> shlist = new HashMap<String,String>();
-		HashMap<String,String> sum = new HashMap<String,String>();
+		HashMap<String,String> branch = new HashMap<String,String>();
+		HashMap<String,Integer> amount = new HashMap<String,Integer>();
+		HashMap<String,String> commodity = new HashMap<String,String>();
+		HashMap<String,Integer> sum = new HashMap<String,Integer>();
+		HashMap<String,String> rcd = new HashMap<String,String>();
+		HashMap<String,String> shrcd = new HashMap<String,String>();
 
 		try{
 			File file = new File(args[0],"branch.lst");
@@ -25,10 +28,15 @@ public class Read {
 
 			while((s = br.readLine()) != null){
 				String array[] = s.split(",");
-				if(array.length != 2) throw new NumberFormatException();
+				if(array.length != 2){
+					System.out.println("支店定義ファイルのフォーマットは不正です");
+					return;
+				}
 				String cd   = (array[0]);
 				String name = (array[1]);
-				map.put(cd, name);
+
+				branch.put(cd, name);
+				amount.put(cd, 0);
 
 			}
 			br.close();
@@ -54,7 +62,8 @@ public class Read {
 				if(array.length != 2) throw new NumberFormatException();
 				String shcord = array[0];
 				String shname = array[1];
-				maps.put(shcord,shname);
+				commodity.put(shcord,shname);
+				sum.put(shcord, 0);
 			}
 			brs.close();
 
@@ -68,8 +77,6 @@ public class Read {
 		try{
 			File dir = new File(args[0]);
 			File[] f1 = dir.listFiles();
-			int sums = 0;
-			String tmp = null;
 			for(int i = 0; i < f1.length; i++){
 				//箱の初期化の宣言
 				ArrayList<String> list = new ArrayList<String>();
@@ -84,35 +91,46 @@ public class Read {
 					}
 					// 加算処理をする
 					String cord = list.get(0);
-					String shcord = list.get(1);
+					String sh = list.get(1);
 					String sell = list.get(2);
-					lists.put(cord, sell);
-					shlist.put(shcord,sell);
-					//cordとcdのコードを比較、同じならば売上を加算
-					if(map.containsKey(cord) ){
-						tmp = lists.get(cord);
-						if(tmp ==   ){
-							//System.out.println(tmp);
-							sums += Integer.parseInt(tmp);
-						}
-					}else{
-						System.out.println("test");
+
+					if(branch.containsKey(cord)){
+						amount.replace(cord, Integer.parseInt(sell) + amount.get(cord));
+						//amount.put(cord, Integer.parseInt(sell));
 					}
+
+					if(commodity.containsKey(sh)){
+						sum.replace(sh, Integer.parseInt(sell) + sum.get(sh));
+					}
+
 				bb.close();
-				}
 
 				}
 
-						System.out.println(sums);
-			//			System.out.println(lists.entrySet());
-			//			System.out.println(shlist.entrySet());
-
+				}
+						System.out.println(amount);
+						System.out.println(sum);
 		}catch(IOException x){
 			System.out.println(x);
 		}catch(NumberFormatException x){
 			System.out.println("該当ファイル名のフォーマットは不正です");
 			return;
 		}
+
+
+			File newfile = new File(args[0],"branch.out");
+			if(!newfile.exists()){
+				try{
+					newfile.createNewFile();
+				}catch (IOException e){
+					e.printStackTrace();
+				}
+			}
+			File read = new File(args[0],"branch.out");
+			BufferedWriter brw = new BufferedWriter(new FileWriter(read));
+			String l;
+
+
 	}
 }
 
