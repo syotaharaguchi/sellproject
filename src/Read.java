@@ -5,24 +5,30 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class Read {
 	public static void main(String[] args){
 		HashMap<String,String> branch = new HashMap<String,String>();
 		HashMap<String,Integer> amount = new HashMap<String,Integer>();
+		HashMap<String,String> bran = new HashMap<String,String>();
 		HashMap<String,String> commodity = new HashMap<String,String>();
+		HashMap<String,String> dity = new HashMap<String,String>();
 		HashMap<String,Integer> sum = new HashMap<String,Integer>();
-		HashMap<String,String> rcd = new HashMap<String,String>();
-		HashMap<String,String> shrcd = new HashMap<String,String>();
+
+
+		File file = new File(args[0],"branch.lst");
+		File files = new File(args[0],"commodity.lst");
 
 		try{
-			File file = new File(args[0],"branch.lst");
 			if(!file.exists()){
 				System.out.println("支店定義ファイルがありません");
 				return;
 			}
-
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String s;
 
@@ -34,8 +40,8 @@ public class Read {
 				}
 				String cd   = (array[0]);
 				String name = (array[1]);
-
 				branch.put(cd, name);
+				bran.put(cd,cd);
 				amount.put(cd, 0);
 
 			}
@@ -49,7 +55,7 @@ public class Read {
 		}
 
 		try{
-			File files = new File(args[0],"commodity.lst");
+
 			if(!files.exists()){
 				System.out.println("商品定義ファイルがありません");
 				return;
@@ -63,6 +69,7 @@ public class Read {
 				String shcord = array[0];
 				String shname = array[1];
 				commodity.put(shcord,shname);
+				dity.put(shcord, shcord);
 				sum.put(shcord, 0);
 			}
 			brs.close();
@@ -96,7 +103,6 @@ public class Read {
 
 					if(branch.containsKey(cord)){
 						amount.replace(cord, Integer.parseInt(sell) + amount.get(cord));
-						//amount.put(cord, Integer.parseInt(sell));
 					}
 
 					if(commodity.containsKey(sh)){
@@ -108,8 +114,7 @@ public class Read {
 				}
 
 				}
-						System.out.println(amount);
-						System.out.println(sum);
+
 		}catch(IOException x){
 			System.out.println(x);
 		}catch(NumberFormatException x){
@@ -118,19 +123,49 @@ public class Read {
 		}
 
 
-			File newfile = new File(args[0],"branch.out");
-			if(!newfile.exists()){
-				try{
-					newfile.createNewFile();
-				}catch (IOException e){
-					e.printStackTrace();
-				}
-			}
-			File read = new File(args[0],"branch.out");
-			BufferedWriter brw = new BufferedWriter(new FileWriter(read));
-			String l;
+//		try{
+//			File newfile = new File(args[0],"branch.out");
+//			BufferedReader br = new BufferedReader(new FileReader(file));
+//			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
+//			for(String key : branch.keySet()){
+//				bw.write(bran.get(key) +","+ branch.get(key) +","+ amount.get(key));
+//				bw.newLine();
+//			}
+//
+//			br.close();
+//			bw.close();
+//
+//		}catch(IOException e){
+//			System.out.println(e);
+//		}
 
+		try{
+			File newfile = new File(args[0],"commodity.out");
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
 
+				List<HashMap.Entry<String,Integer>> entries = new ArrayList<HashMap.Entry<String,Integer>>
+				(sum.entrySet());
+			        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
+
+			        	public int compare(
+			                    Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
+			                  return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
+			        	 }
+			        });
+			        for (Entry<String,Integer> s : entries) {
+			            System.out.println(s.getKey());
+			            System.out.println(s.getValue());
+
+				bw.write(s.getKey() + "," + s.getValue());
+				bw.newLine();
+			 }
+			br.close();
+			bw.close();
+
+		}catch(IOException e){
+			System.out.println(e);
+		}
 	}
 }
 
