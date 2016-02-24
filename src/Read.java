@@ -15,11 +15,8 @@ public class Read {
 	public static void main(String[] args){
 		HashMap<String,String> branch = new HashMap<String,String>();
 		HashMap<String,Integer> amount = new HashMap<String,Integer>();
-		HashMap<String,String> bran = new HashMap<String,String>();
 		HashMap<String,String> commodity = new HashMap<String,String>();
-		HashMap<String,String> dity = new HashMap<String,String>();
 		HashMap<String,Integer> sum = new HashMap<String,Integer>();
-
 
 		File file = new File(args[0],"branch.lst");
 		File files = new File(args[0],"commodity.lst");
@@ -41,20 +38,17 @@ public class Read {
 				String cd   = (array[0]);
 				String name = (array[1]);
 				branch.put(cd, name);
-				bran.put(cd,cd);
 				amount.put(cd, 0);
 
 				if(!cd.matches("^[0-9]{3}+$" )){
-					System.out.println("エラー、3桁数字のみ");
+					System.out.println("支店定義ファイルのフォーマットは不正です");
+					return;
 				}
 			}
 			br.close();
 
 		}catch(IOException e){
 			System.out.println(e);
-		}catch(NumberFormatException e){
-			System.out.println("支店定義ファイルのフォーマットは不正です");
-			return;
 		}
 
 		try{
@@ -68,26 +62,26 @@ public class Read {
 			String a;
 			while((a = brs.readLine()) != null){
 				String array[] = a.split(",");
-				if(array.length != 2) throw new NumberFormatException();
-				String shcord = array[0];
-				String shname = array[1];
-				commodity.put(shcord,shname);
-				dity.put(shcord,shname);
-				sum.put(shcord, 0);
+				if(array.length != 2){
+					System.out.println("商品定義ファイルのフォーマットが不正です");
+					return;
+				}
+					String shcord = array[0];
+					String shname = array[1];
+					commodity.put(shcord,shname);
+					sum.put(shcord, 0);
 
 				if(!shcord.matches("^[0-9a-zA-Z]{8}+$")){
-					System.out.println("エラー、アルファベットと数字のみ");
+					System.out.println("商品定義ファイルのフォーマットが不正です");
+					return;
 				}
 
 			}
 
 			brs.close();
 
-		}catch(IOException a){
-			System.out.println(a);
-		}catch(NumberFormatException a){
-			System.out.println("支店定義ファイルのフォーマットは不正です");
-			return;
+		}catch(IOException e){
+			System.out.println(e);
 		}
 
 		try{
@@ -98,21 +92,17 @@ public class Read {
 				ArrayList<String> list = new ArrayList<String>();
 
 				if(f1[i].getName().endsWith(".rcd")){
-					File f2 = f1[i];
-					BufferedReader  bb = new BufferedReader(new FileReader(f2));
-					String b;
+						File f2 = f1[i];
+						BufferedReader  bb = new BufferedReader(new FileReader(f2));
+						String b;
 					while((b = bb.readLine()) != null){
 						list.add(b);
 
 					}
-					// 加算処理をする
-					String cord = list.get(0);
-					String sh = list.get(1);
-					String sell = list.get(2);
-
-					if(!cord.matches("^[0-9]{3}+$")){
-						System.out.println("エラー、３桁数字固定");
-					}
+						// 加算処理をする
+						String cord = list.get(0);
+						String sh = list.get(1);
+						String sell = list.get(2);
 
 					if(branch.containsKey(cord)){
 						amount.replace(cord, Integer.parseInt(sell) + amount.get(cord));
@@ -124,17 +114,26 @@ public class Read {
 
 				bb.close();
 
+				if(!cord.matches("^[0-9]{3}+$")){
+						System.out.println("エラー、３桁数字固定");
+						return;
 				}
+				if(!sh.matches("^[0-9a-zA-Z]{8}+$")){
+						System.out.println("アルファベットと数字。８桁固定");
+						return;
+				}
+				long sellcord = amount.get(cord);
+				String.valueOf(sellcord).length();
+				System.out.println(sellcord);
+
 
 				}
 
-		}catch(IOException x){
-			System.out.println(x);
-		}catch(NumberFormatException x){
-			System.out.println("該当ファイル名のフォーマットは不正です");
-			return;
+			}
+
+		}catch(IOException e){
+			System.out.println(e);
 		}
-
 
 		try{
 			File newfile = new File(args[0],"branch.out");
@@ -153,8 +152,17 @@ public class Read {
 		        }
 		        );
 		        for (Entry<String,Integer> s : entries){
-		        	bw.write(s.getKey() + "," + branch.get(s.getKey()) + "," + s.getValue());
-					bw.newLine();
+		        	if(!s.getKey().matches("^[0-9a-zA-Z]{3}+$")){
+			        	System.out.println("アルファベットと数字。８桁固定");
+			        	return;
+			        }
+			        String array[] = String.valueOf(s).split(",");
+			        	if(array.length !=3){
+		        		return;
+		        	}
+//		        	bw.write(s.getKey() + "," + branch.get(s.getKey()) + "," + s.getValue());
+//					bw.newLine();
+
 		        }
 
 			br.close();
@@ -173,7 +181,6 @@ public class Read {
 				(sum.entrySet());
 
 			        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
-
 			        	public int compare(
 				             Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
 				             return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
@@ -181,9 +188,16 @@ public class Read {
 			        }
 			        );
 			        for (Entry<String,Integer> s : entries){
-
-			        	bw.write(s.getKey() + "," + commodity.get(s.getKey()) + "," + s.getValue());
-						bw.newLine();
+			        	if(!s.getKey().matches("^[0-9a-zA-Z]{8}+$")){
+				        	System.out.println("アルファベットと数字。８桁固定");
+				        	return;
+				        }
+				        String array[] = String.valueOf(s).split(",");
+				        	if(array.length !=3){
+			        		return;
+			        	}
+//			        	bw.write(s.getKey() + "," + commodity.get(s.getKey()) + "," + s.getValue());
+//						bw.newLine();
 			        }
 			br.close();
 			bw.close();
