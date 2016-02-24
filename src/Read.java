@@ -44,6 +44,9 @@ public class Read {
 				bran.put(cd,cd);
 				amount.put(cd, 0);
 
+				if(!cd.matches("^[0-9]{3}+$" )){
+					System.out.println("エラー、3桁数字のみ");
+				}
 			}
 			br.close();
 
@@ -69,9 +72,15 @@ public class Read {
 				String shcord = array[0];
 				String shname = array[1];
 				commodity.put(shcord,shname);
-				dity.put(shcord, shcord);
+				dity.put(shcord,shname);
 				sum.put(shcord, 0);
+
+				if(!shcord.matches("^[0-9a-zA-Z]{8}+$")){
+					System.out.println("エラー、アルファベットと数字のみ");
+				}
+
 			}
+
 			brs.close();
 
 		}catch(IOException a){
@@ -101,6 +110,10 @@ public class Read {
 					String sh = list.get(1);
 					String sell = list.get(2);
 
+					if(!cord.matches("^[0-9]{3}+$")){
+						System.out.println("エラー、３桁数字固定");
+					}
+
 					if(branch.containsKey(cord)){
 						amount.replace(cord, Integer.parseInt(sell) + amount.get(cord));
 					}
@@ -123,21 +136,33 @@ public class Read {
 		}
 
 
-//		try{
-//			File newfile = new File(args[0],"branch.out");
-//			BufferedReader br = new BufferedReader(new FileReader(file));
-//			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
-//			for(String key : branch.keySet()){
-//				bw.write(bran.get(key) +","+ branch.get(key) +","+ amount.get(key));
-//				bw.newLine();
-//			}
-//
-//			br.close();
-//			bw.close();
-//
-//		}catch(IOException e){
-//			System.out.println(e);
-//		}
+		try{
+			File newfile = new File(args[0],"branch.out");
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
+
+			List<HashMap.Entry<String,Integer>> entries = new ArrayList<HashMap.Entry<String,Integer>>
+			(amount.entrySet());
+
+		        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
+
+		        	public int compare(
+			             Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
+			             return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
+		        	}
+		        }
+		        );
+		        for (Entry<String,Integer> s : entries){
+		        	bw.write(s.getKey() + "," + branch.get(s.getKey()) + "," + s.getValue());
+					bw.newLine();
+		        }
+
+			br.close();
+			bw.close();
+
+		}catch(IOException e){
+			System.out.println(e);
+		}
 
 		try{
 			File newfile = new File(args[0],"commodity.out");
@@ -146,20 +171,20 @@ public class Read {
 
 				List<HashMap.Entry<String,Integer>> entries = new ArrayList<HashMap.Entry<String,Integer>>
 				(sum.entrySet());
+
 			        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
 
 			        	public int compare(
-			                    Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
-			                  return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
-			        	 }
-			        });
-			        for (Entry<String,Integer> s : entries) {
-			            System.out.println(s.getKey());
-			            System.out.println(s.getValue());
+				             Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
+				             return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
+			        	}
+			        }
+			        );
+			        for (Entry<String,Integer> s : entries){
 
-				bw.write(s.getKey() + "," + s.getValue());
-				bw.newLine();
-			 }
+			        	bw.write(s.getKey() + "," + commodity.get(s.getKey()) + "," + s.getValue());
+						bw.newLine();
+			        }
 			br.close();
 			bw.close();
 
