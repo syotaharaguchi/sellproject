@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -23,7 +22,7 @@ public class Read {
 
 		try{
 			if(!file.exists()){
-				System.out.println("支店定義ファイルがありません");
+				System.out.println("支店定義ファイルが存在しません");
 				return;
 			}
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -35,15 +34,17 @@ public class Read {
 					System.out.println("支店定義ファイルのフォーマットは不正です");
 					return;
 				}
+
 				String cd   = (array[0]);
 				String name = (array[1]);
-				branch.put(cd, name);
-				amount.put(cd, (long) 0);
 
 				if(!cd.matches("^[0-9]{3}+$" )){
 					System.out.println("支店定義ファイルのフォーマットは不正です");
 					return;
 				}
+
+				branch.put(cd, name);
+				amount.put(cd, (long) 0);
 			}
 			br.close();
 
@@ -54,7 +55,7 @@ public class Read {
 		try{
 
 			if(!files.exists()){
-				System.out.println("商品定義ファイルがありません");
+				System.out.println("商品定義ファイルが存在しません");
 				return;
 			}
 
@@ -68,14 +69,13 @@ public class Read {
 				}
 					String shcord = array[0];
 					String shname = array[1];
+
+					if(!shcord.matches("^[0-9a-zA-Z]{8}+$")){
+						System.out.println("商品定義ファイルのフォーマットが不正です");
+						return;
+					}
 					commodity.put(shcord,shname);
 					sum.put(shcord, (long) 0);
-
-				if(!shcord.matches("^[0-9a-zA-Z]{8}+$")){
-					System.out.println("商品定義ファイルのフォーマットが不正です");
-					return;
-				}
-
 			}
 
 			brs.close();
@@ -85,15 +85,26 @@ public class Read {
 		}
 
 		try{
+			ArrayList<File> lists = new ArrayList<File>();
 			File dir = new File(args[0]);
 			File[] f1 = dir.listFiles();
-			for(int i = 0; i < f1.length; i++){
+			for(int i = 0; i< f1.length; i++){
+				if(f1[i].getName().endsWith(".rcd")){
+					lists.add(f1[i]);
+				}
+			}
+
+			for(int i = 0; i < lists.size(); i++){
 				//箱の初期化の宣言
 				ArrayList<String> list = new ArrayList<String>();
-				if(f1[i].getName().endsWith(".rcd")){
-						File f2 = f1[i];
 
-						BufferedReader  bb = new BufferedReader(new FileReader(f2));
+				String str = lists.get(i).getName().split(".rcd")[0];
+				if(Integer.parseInt(str) != i+1){
+					System.out.println("売上ファイルが連番になっていません");
+					return;
+				}
+
+						BufferedReader  bb = new BufferedReader(new FileReader(lists.get(i)));
 						String b;
 					while((b = bb.readLine()) != null){;
 						list.add(b);
@@ -139,7 +150,6 @@ public class Read {
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
-				}
 			}
 
 		}catch(IOException e){
@@ -148,8 +158,8 @@ public class Read {
 
 		try{
 			File newfile = new File(args[0],"branch.out");
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
+			FileWriter filewriter = null;
+			filewriter = new FileWriter(newfile);
 
 			List<HashMap.Entry<String,Long>> entries = new ArrayList<HashMap.Entry<String,Long>>
 			(amount.entrySet());
@@ -162,23 +172,17 @@ public class Read {
 		        	}
 		        }
 		        );
+
 		        for (Entry<String,Long> s : entries){
+			        System.out.println(s);
 		        	if(!s.getKey().matches("^[0-9a-zA-Z]{3}+$")){
 			        	System.out.println("アルファベットと数字。８桁固定");
 			        	return;
 			        }
-			        String array[] = String.valueOf(s).split(",");
-			        	if(array.length !=3){
-		        		return;
-		        	}
-//		        	bw.write(s.getKey() + "," + branch.get(s.getKey()) + "," + s.getValue());
-//					bw.newLine();
+		        	filewriter.write(s.getKey() + "," + branch.get(s.getKey()) + "," + s.getValue() + "\r\n");
 
 		        }
-
-
-			br.close();
-			bw.close();
+		        filewriter.close();
 
 		}catch(IOException e){
 			System.out.println(e);
@@ -186,8 +190,8 @@ public class Read {
 
 		try{
 			File newfile = new File(args[0],"commodity.out");
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
+			FileWriter filewriter = null;
+			filewriter = new FileWriter(newfile);
 
 				List<HashMap.Entry<String,Long>> entries = new ArrayList<HashMap.Entry<String,Long>>
 				(sum.entrySet());
@@ -204,15 +208,11 @@ public class Read {
 				        	System.out.println("アルファベットと数字。８桁固定");
 				        	return;
 				        }
-				        String array[] = String.valueOf(s).split(",");
-				        	if(array.length !=3){
-			        		return;
-			        	}
-//			        	bw.write(s.getKey() + "," + commodity.get(s.getKey()) + "," + s.getValue());
-//						bw.newLine();
+			        	filewriter.write(s.getKey() + "," + commodity.get(s.getKey()) + "," + s.getValue() + "\r\n");
+
 			        }
-			br.close();
-			bw.close();
+			        filewriter.close();
+
 
 		}catch(IOException e){
 			System.out.println(e);
