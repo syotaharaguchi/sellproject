@@ -14,9 +14,9 @@ import java.util.Map.Entry;
 public class Read {
 	public static void main(String[] args){
 		HashMap<String,String> branch = new HashMap<String,String>();
-		HashMap<String,Integer> amount = new HashMap<String,Integer>();
+		HashMap<String,Long> amount = new HashMap<String,Long>();
 		HashMap<String,String> commodity = new HashMap<String,String>();
-		HashMap<String,Integer> sum = new HashMap<String,Integer>();
+		HashMap<String,Long> sum = new HashMap<String,Long>();
 
 		File file = new File(args[0],"branch.lst");
 		File files = new File(args[0],"commodity.lst");
@@ -38,7 +38,7 @@ public class Read {
 				String cd   = (array[0]);
 				String name = (array[1]);
 				branch.put(cd, name);
-				amount.put(cd, 0);
+				amount.put(cd, (long) 0);
 
 				if(!cd.matches("^[0-9]{3}+$" )){
 					System.out.println("支店定義ファイルのフォーマットは不正です");
@@ -69,7 +69,7 @@ public class Read {
 					String shcord = array[0];
 					String shname = array[1];
 					commodity.put(shcord,shname);
-					sum.put(shcord, 0);
+					sum.put(shcord, (long) 0);
 
 				if(!shcord.matches("^[0-9a-zA-Z]{8}+$")){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
@@ -90,26 +90,37 @@ public class Read {
 			for(int i = 0; i < f1.length; i++){
 				//箱の初期化の宣言
 				ArrayList<String> list = new ArrayList<String>();
-
 				if(f1[i].getName().endsWith(".rcd")){
 						File f2 = f1[i];
+
 						BufferedReader  bb = new BufferedReader(new FileReader(f2));
 						String b;
-					while((b = bb.readLine()) != null){
+					while((b = bb.readLine()) != null){;
 						list.add(b);
-
 					}
+
+				int	counter = list.size();
+					if(counter == 4){
+						System.out.println("フォーマットが不正です。");
+					}
+
 						// 加算処理をする
 						String cord = list.get(0);
 						String sh = list.get(1);
 						String sell = list.get(2);
 
 					if(branch.containsKey(cord)){
-						amount.replace(cord, Integer.parseInt(sell) + amount.get(cord));
+						amount.replace(cord, Long.parseLong(sell) + amount.get(cord));
+					}else{
+						System.out.println("支店コードが不正です");
+						return;
 					}
 
 					if(commodity.containsKey(sh)){
-						sum.replace(sh, Integer.parseInt(sell) + sum.get(sh));
+						sum.replace(sh, Long.parseLong(sell) + sum.get(sh));
+					}else{
+						System.out.println("商品コードが不正です");
+						return;
 					}
 
 				bb.close();
@@ -123,12 +134,12 @@ public class Read {
 						return;
 				}
 				long sellcord = amount.get(cord);
-				String.valueOf(sellcord).length();
-				System.out.println(sellcord);
-
-
+				long value = String.valueOf(sellcord).length();
+				if(value >= 10){
+					System.out.println("合計金額が10桁を超えました");
+					return;
 				}
-
+				}
 			}
 
 		}catch(IOException e){
@@ -140,18 +151,18 @@ public class Read {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
 
-			List<HashMap.Entry<String,Integer>> entries = new ArrayList<HashMap.Entry<String,Integer>>
+			List<HashMap.Entry<String,Long>> entries = new ArrayList<HashMap.Entry<String,Long>>
 			(amount.entrySet());
 
-		        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
+		        Collections.sort(entries, new Comparator<HashMap.Entry<String,Long>>() {
 
 		        	public int compare(
-			             Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
-			             return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
+			             Entry<String,Long> entry1, Entry<String,Long> entry2) {
+			             return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
 		        	}
 		        }
 		        );
-		        for (Entry<String,Integer> s : entries){
+		        for (Entry<String,Long> s : entries){
 		        	if(!s.getKey().matches("^[0-9a-zA-Z]{3}+$")){
 			        	System.out.println("アルファベットと数字。８桁固定");
 			        	return;
@@ -165,6 +176,7 @@ public class Read {
 
 		        }
 
+
 			br.close();
 			bw.close();
 
@@ -177,17 +189,17 @@ public class Read {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(newfile,true));
 
-				List<HashMap.Entry<String,Integer>> entries = new ArrayList<HashMap.Entry<String,Integer>>
+				List<HashMap.Entry<String,Long>> entries = new ArrayList<HashMap.Entry<String,Long>>
 				(sum.entrySet());
 
-			        Collections.sort(entries, new Comparator<HashMap.Entry<String,Integer>>() {
+			        Collections.sort(entries, new Comparator<HashMap.Entry<String,Long>>() {
 			        	public int compare(
-				             Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
-				             return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
+				             Entry<String,Long> entry1, Entry<String,Long> entry2) {
+				             return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
 			        	}
 			        }
 			        );
-			        for (Entry<String,Integer> s : entries){
+			        for (Entry<String,Long> s : entries){
 			        	if(!s.getKey().matches("^[0-9a-zA-Z]{8}+$")){
 				        	System.out.println("アルファベットと数字。８桁固定");
 				        	return;
